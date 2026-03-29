@@ -1090,16 +1090,36 @@ select.form-ctrl{appearance:none;cursor:pointer}
   });
 
   // ── Contact form ──
+// ── Contact form ──
   var form    = document.getElementById('contactForm');
   var subBtn  = document.getElementById('submitBtn');
   var formMsg = document.getElementById('formMsg');
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
+    var originalBtnText = subBtn.innerHTML;
+
     subBtn.disabled = true;
     subBtn.innerHTML = 'Sending…';
 
-    setTimeout(function() {
+    var formData = {
+      name: document.getElementById('f-name').value,
+      email: document.getElementById('f-email').value,
+      phone: document.getElementById('f-phone').value,
+      service: document.getElementById('f-service').value,
+      message: document.getElementById('f-msg').value
+    };
+
+    // PASTE YOUR GOOGLE APPS SCRIPT URL HERE
+    var scriptURL = 'PASTE_YOUR_WEB_APP_URL_HERE';
+
+    fetch(scriptURL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    })
+    .then(function() {
       subBtn.innerHTML = '✓ Message Sent';
       subBtn.style.background = '#2D7D46';
       formMsg.style.display = 'block';
@@ -1109,7 +1129,19 @@ select.form-ctrl{appearance:none;cursor:pointer}
       formMsg.style.borderRadius = '4px';
       formMsg.textContent = 'Thank you! We will respond to your enquiry within 24 hours.';
       form.reset();
-    }, 1400);
+
+      setTimeout(function() {
+        subBtn.innerHTML = originalBtnText;
+        subBtn.style.background = '';
+        subBtn.disabled = false;
+        formMsg.style.display = 'none';
+      }, 5000);
+    })
+    .catch(function(error) {
+      subBtn.innerHTML = 'Error. Try Again.';
+      subBtn.style.background = '#e53e3e';
+      subBtn.disabled = false;
+    });
   });
 
   // ── Image error fallback: swap broken images to a themed placeholder ──
